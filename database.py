@@ -22,7 +22,7 @@ def init_database(database_path=DATABASE_PATH):
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL,
+                password TEXT NOT NULL,
                 role TEXT NOT NULL DEFAULT 'student'
                     CHECK (role IN ('admin', 'student')),
                 balance REAL NOT NULL DEFAULT 0
@@ -98,6 +98,14 @@ def init_database(database_path=DATABASE_PATH):
                 ON rentals(book_id, status);
             """
         )
+
+        user_columns = {
+            row["name"] for row in connection.execute("PRAGMA table_info(users)")
+        }
+        if "password_hash" in user_columns and "password" not in user_columns:
+            connection.execute(
+                "ALTER TABLE users RENAME COLUMN password_hash TO password"
+            )
 
 
 if __name__ == "__main__":
