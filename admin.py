@@ -23,10 +23,10 @@ def read_book () :
         try:
             purchase_price = float(input("Enter book purchase price : "))
             rental_price = float(input("Enter book rental price : "))
-            stock = int(input("Enter book stock : "))
             break
         except ValueError:
-            print("Please enter valid numbers for prices and stock.")
+            print("Please enter valid numbers for prices.")
+    stock = int(input("Enter book stock : "))   
     print("------------------------------------------------")
     return Book(
        title,
