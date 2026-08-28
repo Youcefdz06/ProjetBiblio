@@ -3,6 +3,7 @@ import sqlite3
 from auth import login
 from database import init_database
 from admin import Book, add_book, read_book
+from user import buy_book, get_user_balance, show_books_stock
 from utilities import ask_yn
 
 current_user = None
@@ -83,3 +84,40 @@ while current_user is None:
 
     else:
         print(f"Welcome, {current_user['username']}! You are logged in as a student.")
+
+        user_choice =""
+
+        while user_choice != "1" or user_choice != "2" or user_choice != "3" or user_choice != "4" or user_choice != "5" or user_choice != "6":
+            print("Enter the right choice!")
+            user_choice = str(input(f"1-View stock ,2-Buy a book ,3-Rent a book ,4-Return a book ,5-Show balance ,6-Show active rentals"))
+            if  user_choice == "1" or user_choice == "2" or user_choice == "3" or user_choice == "4" or user_choice == "5" or user_choice == "6":
+                match user_choice:
+                    case "1":
+                        show_books_stock()
+                    case "2":
+                        show_books_stock()
+                        try:
+                            id_book = int(input("Enter the book ID: "))
+                        except ValueError:
+                            print("The book ID must be a number.")
+                            continue
+
+                        current_user["balance"]= get_user_balance(current_user["id"])
+                        buy_book(
+                            id_book,
+                            current_user["id"],
+                            current_user["balance"],
+                        )
+                    case "3":
+                        print("future feature")
+                    case "4":
+                        print("future feature")
+                    case "5":
+                        print("future feature")
+                    case "6":
+                        print("future feature")
+                break
+                
+            
+        
+
