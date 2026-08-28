@@ -1,20 +1,63 @@
+import os
 import sqlite3
 from contextlib import closing
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 
 DATABASE_PATH = Path(__file__).with_name("library.db")
+load_dotenv(Path(__file__).with_name(".env"))
 
 
-def get_connection(database_path=DATABASE_PATH):
-    """Open a SQLite connection configured for this application."""
-    connection = sqlite3.connect(database_path)
-    connection.row_factory = sqlite3.Row
+def _database_error_types(error_name, sqlite_error):
+    try:
+        import turso_serverless
+    except ImportError:
+        return (sqlite_error,)
+
+    return (sqlite_error, getattr(turso_serverless, error_name))
+
+
+INTEGRITY_ERRORS = _database_error_types("IntegrityError", sqlite3.IntegrityError)
+OPERATIONAL_ERRORS = _database_error_types(
+    "OperationalError", sqlite3.OperationalError
+)
+DATABASE_ERRORS = _database_error_types("DatabaseError", sqlite3.DatabaseError)
+
+
+def get_connection(database_path=None):
+    """Open a local SQLite connection or the configured Turso database."""
+    database_url = os.getenv("TURSO_DATABASE_URL", "").strip()
+    auth_token = os.getenv("TURSO_AUTH_TOKEN", "").strip()
+
+    if database_path is None and (database_url or auth_token):
+        if not database_url or not auth_token:
+            raise RuntimeError(
+                "TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must both be configured."
+            )
+
+        try:
+            import turso_serverless
+        except ImportError as error:
+            raise RuntimeError(
+                "Install the Turso driver with: pip install turso_serverless"
+            ) from error
+
+        connection = turso_serverless.connect(
+            database_url,
+            auth_token=auth_token,
+        )
+        connection.row_factory = turso_serverless.Row
+    else:
+        connection = sqlite3.connect(database_path or DATABASE_PATH)
+        connection.row_factory = sqlite3.Row
+
     connection.execute("PRAGMA foreign_keys = ON")
     return connection
 
 
-def init_database(database_path=DATABASE_PATH):
+def init_database(database_path=None):
     """Create the library database and its tables if they do not exist."""
     with closing(get_connection(database_path)) as connection, connection:
         connection.executescript(
@@ -137,4 +180,7 @@ def init_database(database_path=DATABASE_PATH):
 
 if __name__ == "__main__":
     init_database()
-    print(f"Database initialized: {DATABASE_PATH}")
+    if os.getenv("TURSO_DATABASE_URL", "").strip():
+        print("Turso database initialized.")
+    else:
+        print(f"Database initialized: {DATABASE_PATH}")

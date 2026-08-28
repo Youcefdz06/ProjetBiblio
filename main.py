@@ -1,7 +1,12 @@
 import sqlite3
 
 from auth import login
-from database import init_database
+from database import (
+    DATABASE_ERRORS,
+    INTEGRITY_ERRORS,
+    OPERATIONAL_ERRORS,
+    init_database,
+)
 from admin import Book, add_book, read_book
 from user import (
     buy_book,
@@ -14,6 +19,7 @@ from user import (
 )
 from utilities import ask_yn
 
+init_database()
 current_user = None
 
 print("Welcome to our library!")
@@ -30,10 +36,10 @@ while current_user is None:
 
     try:
         current_user = login(login_username, login_password)
-    except sqlite3.OperationalError:
+    except OPERATIONAL_ERRORS:
         print("The database could not be accessed. Close it in DB Browser and try again.")
         break
-    except sqlite3.DatabaseError:
+    except DATABASE_ERRORS:
         print("The database is damaged or invalid.")
         break
 
@@ -68,13 +74,13 @@ while current_user is None:
                    if x == "y" : 
                       try:
                           add_book(B)
-                      except sqlite3.IntegrityError:
+                      except INTEGRITY_ERRORS:
                           print("This book already exists or contains invalid values.")
                           continue
-                      except sqlite3.OperationalError:
+                      except OPERATIONAL_ERRORS:
                           print("The database could not be accessed.")
                           continue
-                      except sqlite3.DatabaseError:
+                      except DATABASE_ERRORS:
                           print("The database is damaged or invalid.")
                           continue
                       except (AttributeError, TypeError):
