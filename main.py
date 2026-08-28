@@ -3,7 +3,15 @@ import sqlite3
 from auth import login
 from database import init_database
 from admin import Book, add_book, read_book
-from user import buy_book, get_user_balance, show_books_stock
+from user import (
+    buy_book,
+    get_user_balance,
+    rent_book,
+    return_book,
+    show_books_stock,
+    show_rented_books,
+    show_transaction_history,
+)
 from utilities import ask_yn
 
 current_user = None
@@ -87,10 +95,10 @@ while current_user is None:
 
         user_choice =""
 
-        while user_choice != "1" or user_choice != "2" or user_choice != "3" or user_choice != "4" or user_choice != "5" or user_choice != "6":
+        while user_choice != "1" or user_choice != "2" or user_choice != "3" or user_choice != "4" or user_choice != "5" or user_choice != "6" or user_choice != "7":
             print("Enter the right choice!")
-            user_choice = str(input(f"1-View stock ,2-Buy a book ,3-Rent a book ,4-Return a book ,5-Show balance ,6-Show active rentals"))
-            if  user_choice == "1" or user_choice == "2" or user_choice == "3" or user_choice == "4" or user_choice == "5" or user_choice == "6":
+            user_choice = str(input(f"1-View stock ,2-Buy a book ,3-Rent a book ,4-Return a book ,5-Show balance ,6-Show active rentals ,7-Show transaction history"))
+            if  user_choice == "1" or user_choice == "2" or user_choice == "3" or user_choice == "4" or user_choice == "5" or user_choice == "6" or user_choice == "7":
                 match user_choice:
                     case "1":
                         show_books_stock()
@@ -109,13 +117,23 @@ while current_user is None:
                             current_user["balance"],
                         )
                     case "3":
-                        print("future feature")
+                        show_books_stock()
+                        try:
+                            id_book = int(input("Enter the book ID: "))
+                        except ValueError:
+                            print("The book ID must be a number.")
+                            continue
+                        current_user["balance"]= get_user_balance(current_user["id"])
+                        rent_book(id_book, current_user["id"], current_user["balance"],)
+
                     case "4":
-                        print("future feature")
+                        return_book(current_user["id"])
                     case "5":
-                        print("future feature")
+                        print(f"Your balance is ${get_user_balance(current_user['id']):.2f}")
                     case "6":
-                        print("future feature")
+                        show_rented_books(current_user["id"])
+                    case "7":
+                        show_transaction_history(current_user["id"])
                 break
                 
             

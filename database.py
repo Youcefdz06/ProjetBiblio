@@ -84,6 +84,19 @@ def init_database(database_path=DATABASE_PATH):
                     ON UPDATE CASCADE ON DELETE RESTRICT
             );
 
+            CREATE TRIGGER IF NOT EXISTS set_rental_due_at
+            AFTER INSERT ON rentals
+            WHEN NEW.due_at IS NULL
+            BEGIN
+                UPDATE rentals
+                SET due_at = datetime(NEW.rented_at, '+14 days')
+                WHERE id = NEW.id;
+            END;
+
+            UPDATE rentals
+            SET due_at = datetime(rented_at, '+14 days')
+            WHERE due_at IS NULL;
+
             CREATE INDEX IF NOT EXISTS idx_books_title
                 ON books(title);
             CREATE INDEX IF NOT EXISTS idx_books_author
@@ -106,6 +119,20 @@ def init_database(database_path=DATABASE_PATH):
             connection.execute(
                 "ALTER TABLE users RENAME COLUMN password_hash TO password"
             )
+
+        for table_name in ("purchases", "rentals"):
+            columns = {
+                row["name"]
+                for row in connection.execute(f"PRAGMA table_info({table_name})")
+            }
+            if "balance_before" in columns:
+                connection.execute(
+                    f"ALTER TABLE {table_name} DROP COLUMN balance_before"
+                )
+            if "balance_after" in columns:
+                connection.execute(
+                    f"ALTER TABLE {table_name} DROP COLUMN balance_after"
+                )
 
 
 if __name__ == "__main__":

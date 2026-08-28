@@ -48,6 +48,40 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(columns["password"], "TEXT")
         self.assertNotIn("password_hash", columns)
 
+    def test_rental_due_date_is_set_to_fourteen_days(self):
+        with closing(get_connection(self.database_path)) as connection, connection:
+            user_id = connection.execute(
+                """
+                INSERT INTO users (username, password, role, balance)
+                VALUES ('student', 'password', 'student', 100)
+                """
+            ).lastrowid
+            book_id = connection.execute(
+                """
+                INSERT INTO books (
+                    title, author, purchase_price, rental_price, stock
+                )
+                VALUES ('Test Book', 'Test Author', 20, 5, 1)
+                """
+            ).lastrowid
+            rental_id = connection.execute(
+                """
+                INSERT INTO rentals (
+                    user_id, book_id, quantity, unit_price, rented_at
+                )
+                VALUES (?, ?, 1, 5, '2026-08-28 10:00:00')
+                """,
+                (user_id, book_id),
+            ).lastrowid
+
+            rental = connection.execute(
+                "SELECT rented_at, due_at FROM rentals WHERE id = ?",
+                (rental_id,),
+            ).fetchone()
+
+        self.assertEqual(rental["rented_at"], "2026-08-28 10:00:00")
+        self.assertEqual(rental["due_at"], "2026-09-11 10:00:00")
+
 
 if __name__ == "__main__":
     unittest.main()
