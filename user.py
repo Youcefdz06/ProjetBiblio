@@ -18,7 +18,7 @@ def show_books_stock():
             """
             SELECT id, title, author, purchase_price, rental_price, stock
             FROM books
-            ORDER BY Id
+            ORDER BY id
             """
         ).fetchall()
 
@@ -28,7 +28,7 @@ def show_books_stock():
 
     for book in books:
         print("__"*60)
-        print(f"-{book['Id']}")
+        print(f"-{book['id']}")
         print(f"Title: {book['title']}")
         print(f"Author: {book['author']}")
         print(f"Buy price: ${book['purchase_price']:.2f}")
