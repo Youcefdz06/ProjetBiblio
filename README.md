@@ -1,150 +1,199 @@
-# 📚 ProjetBiblio
+<div align="center">
 
-ProjetBiblio is a command-line library management application built with Python
-and SQLite. It was created as a learning project to practice modular programming,
-SQL queries, database transactions, input validation, and collaborative GitHub
-workflows.
+# ProjetBiblio
 
-## ✨ Current Features
+### A quiet terminal library for books, members, and shared learning
 
-### 🔐 Authentication
+<p>
+  <a href="https://github.com/Youcefdz06/ProjetBiblio"><strong>Repository</strong></a>
+  &nbsp;&bull;&nbsp;
+  <a href="#getting-started"><strong>Run it</strong></a>
+  &nbsp;&bull;&nbsp;
+  <a href="#the-current-journey"><strong>Explore the flow</strong></a>
+</p>
 
-- Log in with a username and password.
-- Open the administrator or student menu according to the account role.
-- Retry when the supplied credentials are incorrect.
-- Handle common database access and corruption errors.
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-local_database-003B57?style=flat-square&logo=sqlite&logoColor=white)
+![Status](https://img.shields.io/badge/status-learning_project-1F7A8C?style=flat-square)
 
-### 🧑‍💼 Administrator
+</div>
 
-- Enter a book's title, description, author, purchase price, rental price, and
-  initial stock.
-- Validate numeric input for prices and stock.
-- Review and confirm book information before saving it.
-- Add books to the SQLite database.
-- Detect duplicate books and invalid data.
+<br>
 
-### 🎓 Student
+> ProjetBiblio is a terminal-first library manager. It uses Python for the application flow, SQLite for persistent data, and DB Browser for SQLite for hands-on database work.
 
-- View the book catalog and available stock.
-- View purchase and rental prices.
-- Select a book by its ID.
-- Confirm and purchase a book.
-- Check the available stock and account balance before a purchase.
-- Update the stock and student balance in a single transaction.
-- Record completed purchases in the purchase history.
-- Read the latest account balance from the database.
+## At A Glance
 
-## 🚧 Planned Features
+| Layer | What it does |
+| --- | --- |
+| Authentication | Finds a user and routes them by role |
+| Administrator | Reviews and adds books to the catalog |
+| Student | Browses stock and purchases available books |
+| Database | Stores users, books, purchases, and rentals |
+| Collaboration | Keeps the project easy to pull, test, and extend |
 
-- Rent a book.
-- Return a rented book.
-- View active rentals.
-- Edit and delete books as an administrator.
-- Display sales, rental, and inventory statistics.
+## The Library Shelves
 
-## 🗂️ Project Structure
+<table>
+  <tr>
+    <td width="25%" align="center"><strong>ACCESS</strong><br><br><code>auth.py</code><br>Role-based login</td>
+    <td width="25%" align="center"><strong>CATALOG</strong><br><br><code>admin.py</code><br>Add and review books</td>
+    <td width="25%" align="center"><strong>CIRCULATION</strong><br><br><code>user.py</code><br>Stock and purchases</td>
+    <td width="25%" align="center"><strong>ARCHIVE</strong><br><br><code>database.py</code><br>SQLite persistence</td>
+  </tr>
+  <tr>
+    <td colspan="4" align="center">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</td>
+  </tr>
+</table>
+
+## The Current Journey
+
+```text
+Start
+  |
+  v
+Login ----------------------+
+  |                         |
+  +--> Administrator         +--> Student
+       |                          |
+       +--> Add a book            +--> View stock
+            |                     +--> Buy a book
+            +--> Confirm          +--> Future rental flow
+```
+
+### Administrator path
+
+1. Log in with an account whose role is `admin`.
+2. Enter the book details and prices.
+3. Review the displayed information.
+4. Confirm the entry to save it in SQLite.
+
+### Student path
+
+1. Log in with an account whose role is `student`.
+2. View book IDs, prices, and stock.
+3. Select a book to purchase.
+4. Confirm the purchase when the account has enough balance.
+
+## What Works Now
+
+- Role-based login using the `users` table.
+- Admin book creation with numeric validation for prices and stock.
+- Duplicate-book and database-error messages during inserts.
+- Student stock display and purchase flow.
+- Transactional updates for stock, balance, and purchase history.
+- SQLite foreign keys and database constraints.
+- Automated schema tests in `test_database.py`.
+
+## Project Map
 
 ```text
 ProjetBiblio/
-|-- main.py             Application entry point and menus
-|-- auth.py             User authentication
-|-- admin.py            Administrator operations
-|-- user.py             Student catalog, balance, and purchase operations
-|-- database.py         SQLite connection and schema initialization
-|-- utilities.py        Shared utility functions
-|-- test_database.py    Automated SQLite schema tests
-|-- library.db          Local database generated by the application
-`-- .gitignore          Local files excluded from Git
+|-- main.py          Application entry point and role menus
+|-- auth.py          Login query and user session data
+|-- admin.py         Book model, input, and catalog insertion
+|-- user.py          Catalog display, balances, and purchases
+|-- database.py      SQLite connection and schema creation
+|-- utilities.py     Shared yes/no input helper
+|-- test_database.py Database schema tests
+|-- library.db       Local SQLite database
+|-- README.md        Project guide
+`-- .gitignore       Local files excluded from Git
 ```
 
-## 🗄️ Database
+## Database Design
 
-The SQLite schema contains four main tables:
+The application uses four related tables:
 
-- `users`: user accounts, roles, and balances.
-- `books`: book information, prices, and stock.
-- `purchases`: purchase history.
-- `rentals`: active and returned rentals.
+| Table | Purpose |
+| --- | --- |
+| `users` | Usernames, passwords, roles, and balances |
+| `books` | Titles, authors, prices, and stock |
+| `purchases` | Student purchase history |
+| `rentals` | Rental records and return status |
 
-The tables are connected with foreign keys. Database constraints prevent
-negative balances, stock levels, prices, and quantities. User roles are limited
-to `admin` and `student`, while rental statuses are limited to `active` and
-`returned`.
+The schema protects important values such as balances, prices, stock, and quantities. Books are unique by the combination of `title` and `author`.
 
-## ✅ Requirements
+## Getting Started
 
-- Python 3.10 or newer because the project uses `match` / `case`.
-- No external dependencies: Python includes the `sqlite3` module.
+### Requirements
 
-## 🚀 Installation
+- Python 3.10 or newer
+- DB Browser for SQLite for manual database editing
+- No third-party Python packages
+
+### 1. Clone the project
 
 ```bash
 git clone https://github.com/Youcefdz06/ProjetBiblio.git
 cd ProjetBiblio
-python database.py
 ```
 
-The last command creates `library.db` and all required tables when they do not
-already exist. It is safe to run it multiple times because existing data is not
-deleted.
+### 2. Prepare the database
 
-## 👤 Creating a Test Account
+Open `library.db` in DB Browser for SQLite. Create or verify the schema, add test users, then select **Write Changes** before starting the application.
 
-Accounts are currently inserted manually into the `users` table. Example:
+Example test accounts:
 
 ```sql
+INSERT INTO users (username, password, role, balance)
+VALUES ('admin', 'admin123', 'admin', 0);
+
 INSERT INTO users (username, password, role, balance)
 VALUES ('student', 'student123', 'student', 100.00);
 ```
 
-Accepted roles are `admin` and `student`.
-
-## ▶️ Running the Application
+### 3. Run the application
 
 ```bash
 python main.py
 ```
 
-Log in with an account that already exists in the `users` table.
-
-## 🧪 Running the Tests
+### 4. Run the tests
 
 ```bash
 python -m unittest -v
 ```
 
-The tests verify that all required tables are created, foreign-key enforcement
-is enabled, and the expected password column exists.
+## Manual Database Workflow
 
-## 🔄 Purchase Flow
+Because the database is managed manually during development:
 
-When a student purchases a book, the application:
+1. Close the running Python program before editing `library.db`.
+2. Open the database in DB Browser for SQLite.
+3. Make schema or data changes.
+4. Click **Write Changes**.
+5. Close the database in DB Browser before running `main.py`.
 
-1. Finds the selected book.
-2. Checks that at least one copy is available.
-3. Checks that the student has enough money.
-4. Requests confirmation.
-5. Decreases the book stock.
-6. Updates the student's balance.
-7. Adds a row to the `purchases` table.
+Keeping DB Browser closed while Python is running helps prevent `database is locked` errors.
 
-The database operations are committed together so that a completed purchase
-keeps the stock, balance, and purchase history consistent.
+## Roadmap
 
-## 🔒 Security Notice
+- Complete rent and return operations.
+- Show active rentals for students.
+- Add admin edit and delete actions.
+- Add inventory and sales statistics.
+- Improve menu loops and input validation.
+- Replace plain-text passwords with Argon2, bcrypt, or scrypt hashes.
 
-This repository is an educational project. Passwords are currently stored as
-plain text in SQLite. This must never be used in production. A real application
-should store passwords using a dedicated password-hashing algorithm such as
-Argon2, bcrypt, or scrypt.
+## Collaboration Notes
 
-The runtime database may contain local user data. New `library.db` files are
-listed in `.gitignore`, and each developer can generate an empty database by
-running `python database.py`.
+This is a shared learning project. Before pushing:
 
-## 🤝 Collaboration
+```bash
+git pull --rebase origin main
+git status
+git push origin main
+```
 
-The project is developed collaboratively on the `main` branch. Before pushing
-changes, contributors should pull the latest commits, run the test suite, and
-resolve overlapping edits carefully so that another contributor's work is not
-discarded.
+Keep database edits intentional and describe schema changes in the commit message.
+
+## Security Note
+
+This project is for education. Passwords are currently stored as plain text in SQLite, so the application is not suitable for production use. Never commit personal credentials, access tokens, or private database contents.
+
+<div align="center">
+
+Built with Python, SQLite, and a lot of terminal prompts.
+
+</div>
