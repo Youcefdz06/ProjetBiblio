@@ -5,34 +5,37 @@ from database import get_connection
 @dataclass
 class Book:
     title:str
-    discription:str
+    description:str
     author:str 
-    price_buy:float
-    price_rent:float
+    purchase_price:float
+    rental_price:float
     stock:int
 
 
 
-def read_book_ (title ,discription ,author ,price_rent  ,price_buy ,stock) :
-    title = input("enter book title : ")
-    discription = input("enter book discription : ")
-    author = input("enter book author : ")
-    price_rent = float(input("enter book price_sell : "))
-    price_buy = float(input("enter book price_buy : "))
-    stock = int(input("enter book stock : "))
+def read_book () :
+    print("------------------------------------------------")
+    title = input("Enter book title : ")
+    description = input("Enter book description : ")
+    author = input("Enter book author : ")
+    purchase_price = float(input("Enter book purchase price : "))
+    rental_price = float(input("Enter book rental price : "))
+    stock = int(input("Enter book stock : "))
+    print("------------------------------------------------")
     return Book(
        title,
-       discription,
+       description,
        author,
-       price_rent,
-       price_buy,
+       purchase_price,
+       rental_price,
        stock
      )
 
 def add_book (Book) :
     conn = get_connection()
     conn.execute(
-        """INSERT INTO Books (title ,discription ,author ,price_rent  ,price_buy ,stock) VALUES (?,?,?,?,?,?)"""
+        """INSERT INTO books (title, description, author, purchase_price, rental_price, stock) VALUES (?, ?,  ?,?, ?, ?)""",
+        (Book.title, Book.description, Book.author, Book.purchase_price, Book.rental_price, Book.stock)
     )
     conn.commit()
     conn.close()
