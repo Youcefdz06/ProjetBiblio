@@ -60,6 +60,12 @@ def buy_book(id_book, user_id, user_balance):
             print("Not enough balance!")
             return user_balance
 
+        print("------------------------------------------------")
+        print("Title:", book["title"])
+        print("Purchase price:", book["purchase_price"])
+        print("Stock:", book["stock"])
+        print("------------------------------------------------")
+
         confirmation = ask_yn(
             f"Do you want to buy {book['title']}? y/n: "
         )
