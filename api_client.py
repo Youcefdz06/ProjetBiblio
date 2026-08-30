@@ -11,7 +11,7 @@ class APIError(Exception):
 
 
 class LibraryAPIClient:
-    def __init__(self, base_url=None, timeout=20):
+    def __init__(self, base_url=None, timeout=90):
         self.base_url = (
             base_url
             or os.getenv("PROJETBIBLIO_API_URL")
