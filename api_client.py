@@ -3,7 +3,7 @@ import os
 import requests
 
 
-DEFAULT_API_URL = "https://YOUR-API.onrender.com"
+DEFAULT_API_URL = "https://projetbiblio.onrender.com"
 
 
 class APIError(Exception):
