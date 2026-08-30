@@ -2,16 +2,16 @@
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
-REM Try to find Python in PATH first
-set "PYTHON_EXE="
-
-for /f "delims=" %%I in ('where py 2^>nul') do if not defined PYTHON_EXE set "PYTHON_EXE=%%I"
-for /f "delims=" %%I in ('where python 2^>nul') do if not defined PYTHON_EXE set "PYTHON_EXE=%%I"
-
-REM If still not found, show error
+call :find_python
 if not defined PYTHON_EXE (
-    echo [ERROR] Python was not found in PATH.
-    echo Install Python 3.10 or newer, then reopen this launcher.
+    echo Python was not found on this PC. Attempting to install it automatically...
+    call :install_python
+    call :find_python
+)
+
+if not defined PYTHON_EXE (
+    echo [ERROR] Automatic install failed.
+    echo Please install Python 3.10+ manually from https://python.org/downloads and re-run this script.
     pause
     exit /b 1
 )
@@ -45,3 +45,40 @@ if not "%APP_EXIT_CODE%"=="0" (
 )
 
 exit /b %APP_EXIT_CODE%
+
+REM ------------------------------------------------------------
+:find_python
+set "PYTHON_EXE="
+py -3 --version >nul 2>&1
+if not errorlevel 1 (
+    set "PYTHON_EXE=py"
+    goto :eof
+)
+python --version >nul 2>&1
+if not errorlevel 1 (
+    set "PYTHON_EXE=python"
+)
+goto :eof
+
+REM ------------------------------------------------------------
+:install_python
+REM Try winget first (built into Windows 10 1709+ and Windows 11)
+where winget >nul 2>&1
+if not errorlevel 1 (
+    winget install -e --id Python.Python.3.12 --scope user --accept-package-agreements --accept-source-agreements --silent
+    if not errorlevel 1 goto :eof
+)
+
+REM Fall back to downloading the official installer directly
+echo Downloading the official Python installer...
+set "PY_INSTALLER=%TEMP%\python-installer.exe"
+powershell -NoProfile -Command "try { Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.12.14/python-3.12.14-amd64.exe' -OutFile '%PY_INSTALLER%' } catch { exit 1 }"
+if not exist "%PY_INSTALLER%" (
+    echo [ERROR] Could not download the Python installer. Check your internet connection.
+    goto :eof
+)
+"%PY_INSTALLER%" /quiet InstallAllUsers=0 PrependPath=1 Include_test=0
+del "%PY_INSTALLER%" >nul 2>&1
+REM Refresh PATH for the current process so py/python can be found without restarting
+for /f "usebackq tokens=2,*" %%A in (`reg query "HKCU\Environment" /v Path 2^>nul`) do set "PATH=%%B;%PATH%"
+goto :eof
