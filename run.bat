@@ -2,10 +2,13 @@
 setlocal
 cd /d "%~dp0"
 
-set PYTHON_EXE=C:\Users\HP\AppData\Local\Python\pythoncore-3.14-64\python.exe
+REM Try to find Python in PATH first
+for /f "tokens=*" %%i in ('where python 2^>nul') do set "PYTHON_EXE=%%i"
 
-if not exist "%PYTHON_EXE%" (
-    echo [ERROR] Python was not found at %PYTHON_EXE%
+REM If not found in PATH, show error
+if not defined PYTHON_EXE (
+    echo [ERROR] Python was not found. Please install Python and add it to PATH.
+    echo Visit: https://www.python.org/downloads/
     pause
     exit /b 1
 )
