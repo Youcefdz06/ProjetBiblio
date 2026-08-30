@@ -169,6 +169,7 @@ def main():
         client.health()
     except APIError as error:
         print(error)
+        input("Press Enter to close...")
         return
 
     while True:

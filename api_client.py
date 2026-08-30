@@ -30,7 +30,7 @@ class LibraryAPIClient:
             )
         except requests.RequestException as error:
             raise APIError(
-                "The library server is unavailable. Check your internet connection."
+        f"Connection error: {type(error).__name__}: {error}"
             ) from error
 
         if response.status_code >= 400:
