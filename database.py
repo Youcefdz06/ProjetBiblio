@@ -56,6 +56,9 @@ class LibsqlCursorAdapter:
         rows = self._cursor.fetchmany() if size is None else self._cursor.fetchmany(size)
         return [self._convert(row) for row in rows]
 
+    def __iter__(self):
+        return iter(self.fetchall())
+
 
 class LibsqlConnectionAdapter:
     def __init__(self, connection):
