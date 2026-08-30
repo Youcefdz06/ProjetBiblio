@@ -10,13 +10,94 @@ DATABASE_PATH = Path(__file__).with_name("library.db")
 load_dotenv(Path(__file__).with_name(".env"))
 
 
+class DatabaseRow:
+    def __init__(self, columns, values):
+        self._columns = tuple(columns)
+        self._values = tuple(values)
+        self._mapping = dict(zip(self._columns, self._values))
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self._values[key]
+        return self._mapping[key]
+
+    def keys(self):
+        return self._columns
+
+    def __iter__(self):
+        return iter(self._values)
+
+
+class LibsqlCursorAdapter:
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    @property
+    def lastrowid(self):
+        return self._cursor.lastrowid
+
+    @property
+    def rowcount(self):
+        return self._cursor.rowcount
+
+    def _convert(self, row):
+        if row is None:
+            return None
+        columns = [item[0] for item in (self._cursor.description or ())]
+        return DatabaseRow(columns, row)
+
+    def fetchone(self):
+        return self._convert(self._cursor.fetchone())
+
+    def fetchall(self):
+        return [self._convert(row) for row in self._cursor.fetchall()]
+
+    def fetchmany(self, size=None):
+        rows = self._cursor.fetchmany() if size is None else self._cursor.fetchmany(size)
+        return [self._convert(row) for row in rows]
+
+
+class LibsqlConnectionAdapter:
+    def __init__(self, connection):
+        self._connection = connection
+
+    def execute(self, sql, parameters=()):
+        return LibsqlCursorAdapter(self._connection.execute(sql, parameters))
+
+    def executemany(self, sql, parameters):
+        return LibsqlCursorAdapter(self._connection.executemany(sql, parameters))
+
+    def executescript(self, script):
+        return self._connection.executescript(script)
+
+    def commit(self):
+        return self._connection.commit()
+
+    def rollback(self):
+        return self._connection.rollback()
+
+    def close(self):
+        return self._connection.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, error_type, _error, _traceback):
+        if error_type is None:
+            self.commit()
+        else:
+            self.rollback()
+        return False
+
+
 def _database_error_types(error_name, sqlite_error):
     try:
-        import turso_serverless
+        import libsql
     except ImportError:
         return (sqlite_error,)
 
-    return (sqlite_error, getattr(turso_serverless, error_name))
+    remote_error = getattr(libsql, error_name, libsql.Error)
+    return tuple({sqlite_error, remote_error})
 
 
 INTEGRITY_ERRORS = _database_error_types("IntegrityError", sqlite3.IntegrityError)
@@ -38,17 +119,18 @@ def get_connection(database_path=None):
             )
 
         try:
-            import turso_serverless
+            import libsql
         except ImportError as error:
             raise RuntimeError(
-                "Install the Turso driver with: pip install turso_serverless"
+                "Install the Turso driver with: pip install libsql"
             ) from error
 
-        connection = turso_serverless.connect(
-            database_url,
-            auth_token=auth_token,
+        connection = LibsqlConnectionAdapter(
+            libsql.connect(
+                database=database_url,
+                auth_token=auth_token,
+            )
         )
-        connection.row_factory = turso_serverless.Row
     else:
         connection = sqlite3.connect(database_path or DATABASE_PATH)
         connection.row_factory = sqlite3.Row
