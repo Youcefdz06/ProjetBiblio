@@ -91,6 +91,3 @@ def modify_books(id_book):
         )
 
         print("Book updated successfully.")
-
-
-

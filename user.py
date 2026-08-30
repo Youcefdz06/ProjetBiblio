@@ -353,6 +353,3 @@ def show_transaction_history(user_id):
 
     print("__" * 60)
     return transactions
-
-
-
