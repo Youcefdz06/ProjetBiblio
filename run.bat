@@ -2,9 +2,10 @@
 setlocal
 cd /d "%~dp0"
 
-where py >nul 2>&1
-if errorlevel 1 (
-    echo [ERROR] Python was not found. Install Python 3.10 or newer.
+set PYTHON_EXE=C:\Users\HP\AppData\Local\Python\pythoncore-3.14-64\python.exe
+
+if not exist "%PYTHON_EXE%" (
+    echo [ERROR] Python was not found at %PYTHON_EXE%
     pause
     exit /b 1
 )
@@ -16,10 +17,10 @@ if not exist ".env" (
     exit /b 1
 )
 
-py -c "import dotenv; import turso_serverless" >nul 2>&1
+"%PYTHON_EXE%" -c "import dotenv; import turso_serverless" >nul 2>&1
 if errorlevel 1 (
     echo Installing Python dependencies...
-    py -m pip install -r requirements.txt
+    "%PYTHON_EXE%" -m pip install -r requirements.txt
     if errorlevel 1 (
         echo [ERROR] Dependency installation failed.
         pause
@@ -28,7 +29,7 @@ if errorlevel 1 (
 )
 
 echo Starting ProjetBiblio...
-py main.py
+"%PYTHON_EXE%" main.py
 set "APP_EXIT_CODE=%errorlevel%"
 
 if not "%APP_EXIT_CODE%"=="0" (
