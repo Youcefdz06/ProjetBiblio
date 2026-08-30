@@ -1,4 +1,4 @@
-from api_client import APIError, DEFAULT_API_URL, LibraryAPIClient
+from api_client import APIError, LibraryAPIClient
 from menus import admin_menu, login_menu, user_menu
 from utilities import ask_yn
 
@@ -163,9 +163,6 @@ def student_session(client):
 
 def main():
     client = LibraryAPIClient()
-    if client.base_url == DEFAULT_API_URL:
-        print("[SETUP] Replace DEFAULT_API_URL in api_client.py after deploying the API.")
-        return
 
     print("Starting ProjetBiblio...")
     try:
