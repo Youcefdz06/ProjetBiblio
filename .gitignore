@@ -5,3 +5,7 @@ __pycache__/
 *.db
 *.db-shm
 *.db-wal
+build/
+dist/
+*.spec
+*.sqbpro

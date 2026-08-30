@@ -92,7 +92,7 @@ Turso database
 - Active-rental display, book returns, and transaction history.
 - Transactional updates for stock, balance, purchases, and rentals.
 - Turso-compatible foreign keys and database constraints.
-- Automated schema tests in `test_database.py`.
+- Automated API and schema tests in `tests/`.
 
 ## 🗺️ Project Map
 
@@ -102,13 +102,12 @@ ProjetBiblio/
 |-- api_client.py           HTTPS communication with the API
 |-- api.py                  FastAPI routes, sessions, permissions, operations
 |-- database.py             Private Turso connection and schema creation
-|-- utilities.py     Shared yes/no input helper
-|-- test_api.py              API and authorization tests
-|-- test_database.py         Database schema tests
+|-- menus.py                Interactive client menus
+|-- utilities.py            Shared yes/no input helper
+|-- tests/                  API and database test suite
 |-- render.yaml              Render deployment blueprint
 |-- requirements-api.txt     Server dependencies
 |-- requirements-client.txt  Public client dependency
-|-- run.bat                  Windows client launcher
 |-- .env.example             Server-only Turso configuration
 `-- README.md                Project guide
 ```
@@ -205,14 +204,15 @@ password with a salted PBKDF2 hash.
 
 ### 6. ▶️ Public user instructions
 
-A user only needs to download the project and double-click:
+A user can run the Windows executable directly. Developers can run the source
+client with:
 
-```bat
-run.bat
+```bash
+python -m pip install -r requirements-client.txt
+python main.py
 ```
 
-The launcher installs the HTTP client package if necessary. It never asks for
-database credentials.
+The client never asks for database credentials.
 
 To create a single Windows executable for distribution:
 
@@ -227,7 +227,7 @@ The distributable file will be `dist/ProjetBiblio.exe`.
 
 ```bash
 python -m pip install -r requirements-dev.txt
-python -m unittest -v
+python -m unittest discover -s tests -v
 ```
 
 ## ☁️ Turso Workflow
