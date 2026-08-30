@@ -20,26 +20,27 @@
 
 <br>
 
-> 💬 ProjetBiblio is a terminal-first library manager. It uses Python for the application flow and a hosted Turso database for shared persistent data.
+> 💬 ProjetBiblio is a terminal-first library manager. A FastAPI server keeps the
+> Turso credentials private, while the public CMD client only talks to the API.
 
 ## ✨ At A Glance
 
 | Layer | What it does |
 | --- | --- |
-| 🔐 Authentication | Finds a user and routes them by role |
-| 🧑‍💼 Administrator | Reviews and adds books to the catalog |
+| 💻 CMD client | Displays menus and sends HTTPS requests |
+| 🌐 FastAPI server | Authenticates users and enforces permissions |
+| 🧑‍💼 Administrator | Adds, edits, and reviews catalog statistics |
 | 🎓 Student | Browses, buys, rents, returns, and reviews history |
-| 🗄️ Database | Stores shared data in Turso using SQL over HTTP |
-| 🤝 Collaboration | Keeps the project easy to pull, test, and extend |
+| 🗄️ Database | Stores shared data in Turso; credentials stay server-side |
 
 ## 🪵 The Library Shelves
 
 <table>
   <tr>
-    <td width="25%" align="center">🔑<br><strong>ACCESS</strong><br><br><code>auth.py</code><br>Role-based login</td>
-    <td width="25%" align="center">📚<br><strong>CATALOG</strong><br><br><code>admin.py</code><br>Add and review books</td>
-    <td width="25%" align="center">🔄<br><strong>CIRCULATION</strong><br><br><code>user.py</code><br>Buy, rent, and return</td>
-    <td width="25%" align="center">🗄️<br><strong>ARCHIVE</strong><br><br><code>database.py</code><br>Turso persistence</td>
+    <td width="25%" align="center">💻<br><strong>CLIENT</strong><br><br><code>main.py</code><br>Terminal menus</td>
+    <td width="25%" align="center">📡<br><strong>REQUESTS</strong><br><br><code>api_client.py</code><br>HTTPS client</td>
+    <td width="25%" align="center">🔐<br><strong>SERVER</strong><br><br><code>api.py</code><br>Auth and business rules</td>
+    <td width="25%" align="center">🗄️<br><strong>DATABASE</strong><br><br><code>database.py</code><br>Private Turso access</td>
   </tr>
   <tr>
     <td colspan="4" align="center">📕 📘 📗 📙 📕 📘 📗 📙 📕 📘 📗 📙<br>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</td>
@@ -49,17 +50,15 @@
 ## 🧭 The Current Journey
 
 ```text
-Start
-  |
-  v
-Login ----------------------+
-  |                         |
-  +--> Administrator         +--> Student
-       |                          |
-       +--> Add a book            +--> View stock
-            |                     +--> Buy or rent a book
-            +--> Confirm          +--> Return a rental
-                                  +--> View activity history
+CMD client
+   |
+   | HTTPS + session token
+   v
+FastAPI server
+   |
+   | private Turso token
+   v
+Turso database
 ```
 
 ### 🧑‍💼 Administrator path
@@ -81,7 +80,12 @@ Login ----------------------+
 ## ✅ What Works Now
 
 - Role-based login using the `users` table.
+- Public clients never receive the Turso URL or database token.
+- Expiring server sessions protect all catalog and account endpoints.
+- Admin permissions are checked by the API, not only by the menu.
+- Existing plain-text passwords are upgraded to PBKDF2 after a successful login.
 - Admin book creation with numeric validation for prices and stock.
+- Admin book editing and inventory/sales statistics.
 - Duplicate-book and database-error messages during inserts.
 - Student stock display and purchase flow.
 - Rental due dates set automatically to 14 days after checkout.
@@ -94,18 +98,19 @@ Login ----------------------+
 
 ```text
 ProjetBiblio/
-|-- main.py          Application entry point and role menus
-|-- auth.py          Login query and user session data
-|-- admin.py         Book model, input, and catalog insertion
-|-- user.py          Catalog, purchases, rentals, returns, and history
-|-- database.py      Turso connection and schema creation
+|-- main.py                 Public CMD client and role menus
+|-- api_client.py           HTTPS communication with the API
+|-- api.py                  FastAPI routes, sessions, permissions, operations
+|-- database.py             Private Turso connection and schema creation
 |-- utilities.py     Shared yes/no input helper
-|-- test_database.py Database schema tests
-|-- run.bat          Windows launcher
-|-- requirements.txt Python dependencies
-|-- .env.example     Turso configuration template
-|-- README.md        Project guide
-`-- .gitignore       Local files excluded from Git
+|-- test_api.py              API and authorization tests
+|-- test_database.py         Database schema tests
+|-- render.yaml              Render deployment blueprint
+|-- requirements-api.txt     Server dependencies
+|-- requirements-client.txt  Public client dependency
+|-- run.bat                  Windows client launcher
+|-- .env.example             Server-only Turso configuration
+`-- README.md                Project guide
 ```
 
 ## 🗃️ Database Design
@@ -123,65 +128,67 @@ The schema protects important values such as balances, prices, stock, and quanti
 
 ## 🚀 Getting Started
 
-### 🧰 Requirements
-
-- Python 3.10 or newer
-- A Turso database URL and authentication token
-- The packages listed in `requirements.txt`
-
-### 1. 📥 Clone the project
+### 1. 📥 Clone the project (owner/developer)
 
 ```bash
 git clone https://github.com/Youcefdz06/ProjetBiblio.git
 cd ProjetBiblio
 ```
 
-### 2. 📦 Install dependencies
+### 2. 🧪 Test locally
 
 ```bash
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
 ```
 
-### 3. 🔐 Configure Turso
-
-Copy `.env.example` to `.env`, then add your private database credentials:
+Create a server-only `.env`:
 
 ```env
 TURSO_DATABASE_URL=libsql://your-database.turso.io
 TURSO_AUTH_TOKEN=your-private-token
+SESSION_TTL_HOURS=12
 ```
 
-Never commit `.env`. It is excluded by `.gitignore`.
-
-Initialize the remote schema:
+Start the API:
 
 ```bash
-python database.py
+uvicorn api:app --reload
 ```
 
-To migrate users from an existing local `library.db` once:
-
-```bash
-python migrate_users_to_turso.py
-```
-
-### 4. ▶️ Run the application
-
-On Windows, double-click `run.bat` or run:
+In another Windows terminal, point the client to the local API:
 
 ```bat
-run.bat
-```
-
-The launcher checks Python, installs missing dependencies, and starts the app.
-
-You can also launch it directly:
-
-```bash
+set PROJETBIBLIO_API_URL=http://127.0.0.1:8000
 python main.py
 ```
 
-### 5. 👤 Add test users
+### 3. ☁️ Deploy the API on Render
+
+1. Open Render and choose **New > Blueprint**.
+2. Connect this GitHub repository.
+3. Render reads `render.yaml` and creates `projetbiblio-api`.
+4. Enter `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` when requested.
+5. Deploy and copy the resulting URL, for example:
+
+```text
+https://projetbiblio-api.onrender.com
+```
+
+The token is stored only in Render's private environment. It is never sent to
+the CMD client.
+
+### 4. 🔗 Configure the public API address once
+
+Replace `DEFAULT_API_URL` in `api_client.py` with the real Render URL:
+
+```python
+DEFAULT_API_URL = "https://projetbiblio-api.onrender.com"
+```
+
+Commit that public URL. It is not a secret. After this one owner-side change,
+users do not need an `.env`, a Turso URL, or a Turso token.
+
+### 5. 👤 Add accounts
 
 Accounts can be inserted into the hosted `users` table. Example test accounts:
 
@@ -193,25 +200,50 @@ INSERT INTO users (username, password, role, balance)
 VALUES ('student', 'student123', 'student', 100.00);
 ```
 
-### 6. 🧫 Run the tests
+The first successful API login automatically replaces each legacy plain-text
+password with a salted PBKDF2 hash.
+
+### 6. ▶️ Public user instructions
+
+A user only needs to download the project and double-click:
+
+```bat
+run.bat
+```
+
+The launcher installs the HTTP client package if necessary. It never asks for
+database credentials.
+
+To create a single Windows executable for distribution:
 
 ```bash
+python -m pip install pyinstaller
+pyinstaller --onefile --name ProjetBiblio main.py
+```
+
+The distributable file will be `dist/ProjetBiblio.exe`.
+
+### 7. 🧫 Run the tests
+
+```bash
+python -m pip install -r requirements-dev.txt
 python -m unittest -v
 ```
 
 ## ☁️ Turso Workflow
 
-The application loads `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` from `.env`,
-then connects with `turso_serverless`. `database.py` creates missing tables,
-indexes, and triggers without deleting existing remote data. Local `*.db` files
-are ignored and are used only by automated tests or one-time migration tools.
+Only the FastAPI server loads `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. The
+server uses the `libsql` driver, creates missing schema objects, and performs all
+balance, stock, purchase, and rental transactions. The CMD application only
+receives an expiring session token that cannot be used to access Turso directly.
 
 ## 🛣️ Roadmap
 
-- Add admin edit and delete actions.
-- Add inventory and sales statistics.
-- Improve menu loops and input validation.
-- Replace plain-text passwords with Argon2, bcrypt, or scrypt hashes.
+- Add account creation and password-change endpoints.
+- Replace in-memory sessions with signed tokens or Redis before scaling to
+  multiple API workers.
+- Add rate limiting for repeated failed login attempts.
+- Build and attach the Windows executable to GitHub Releases.
 
 ## 🤝 Collaboration Notes
 
@@ -228,7 +260,11 @@ migrations in the commit message.
 
 ## 🔒 Security Note
 
-This project is for education. Passwords are currently stored as plain text in Turso, so the application is not suitable for production use. Never commit personal credentials, `.env`, access tokens, or private database contents.
+Never commit `.env`, Turso tokens, or private database contents. The API checks
+the authenticated user's role for every protected operation. Legacy passwords
+are accepted once and upgraded to PBKDF2; new account-management code should
+store only hashes. In-memory sessions are suitable for this learning deployment
+with one API worker and are intentionally invalidated whenever the server restarts.
 
 <div align="center">
 
