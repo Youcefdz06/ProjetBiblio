@@ -2,30 +2,16 @@
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
-REM Try to find Python in PATH
-for /f "tokens=*" %%i in ('where python 2^>nul') do set "PYTHON_EXE=%%i"
+REM Try to find Python in PATH first
+set "PYTHON_EXE="
 
-REM Check common Python installation directories if not in PATH
-if not defined PYTHON_EXE (
-    for %%D in (
-        "%LOCALAPPDATA%\Programs\Python\Python*\python.exe"
-        "C:\Python*\python.exe"
-        "%ProgramFiles%\Python*\python.exe"
-        "%ProgramFiles(x86)%\Python*\python.exe"
-    ) do (
-        if exist "%%D" (
-            set "PYTHON_EXE=%%D"
-            goto :found_python
-        )
-    )
-)
+for /f "delims=" %%I in ('where py 2^>nul') do if not defined PYTHON_EXE set "PYTHON_EXE=%%I"
+for /f "delims=" %%I in ('where python 2^>nul') do if not defined PYTHON_EXE set "PYTHON_EXE=%%I"
 
-:found_python
 REM If still not found, show error
 if not defined PYTHON_EXE (
-    echo [ERROR] Python was not found on this system.
-    echo Please install Python from: https://www.python.org/downloads/
-    echo Or ensure Python is in your system PATH.
+    echo [ERROR] Python was not found in PATH.
+    echo Install Python 3.10 or newer, then reopen this launcher.
     pause
     exit /b 1
 )
