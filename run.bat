@@ -3,12 +3,15 @@ setlocal
 cd /d "%~dp0"
 
 REM Try to find Python in PATH first
-for /f "tokens=*" %%i in ('where python 2^>nul') do set "PYTHON_EXE=%%i"
+set "PYTHON_EXE="
+
+for /f "delims=" %%I in ('where py 2^>nul') do if not defined PYTHON_EXE set "PYTHON_EXE=%%I"
+for /f "delims=" %%I in ('where python 2^>nul') do if not defined PYTHON_EXE set "PYTHON_EXE=%%I"
 
 REM If not found in PATH, show error
 if not defined PYTHON_EXE (
-    echo [ERROR] Python was not found. Please install Python and add it to PATH.
-    echo Visit: https://www.python.org/downloads/
+    echo [ERROR] Python was not found in PATH.
+    echo Install Python 3.10 or newer, then reopen this launcher.
     pause
     exit /b 1
 )
