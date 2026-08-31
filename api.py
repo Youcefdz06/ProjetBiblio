@@ -287,11 +287,13 @@ def admin_stats(_admin_user=Depends(require_admin)):
                 (SELECT COALESCE(SUM(quantity), 0) FROM rentals) AS units_rented,
                 (SELECT COUNT(*) FROM rentals WHERE status = 'active') AS active_rentals,
                 (SELECT COUNT(*) FROM books WHERE stock <= 2) AS low_stock_titles,
+                (SELECT COUNT(*) FROM books WHERE stock = 0) AS out_of_stock_titles,
                 (SELECT COUNT(*) FROM rentals
                     WHERE status = 'active' AND due_at < CURRENT_TIMESTAMP) AS overdue_rentals,
                 (SELECT COALESCE(SUM(quantity * unit_price), 0) FROM purchases)
                     + (SELECT COALESCE(SUM(quantity * unit_price), 0) FROM rentals)
-                    AS total_revenue
+                    AS total_revenue,
+                (SELECT COUNT(*) FROM users WHERE role = 'student') AS total_students
             """
         ).fetchone()
     return _row_to_dict(row)
