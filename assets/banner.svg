@@ -1,0 +1,57 @@
+<svg width="1200" height="300" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>ProjetBiblio</title>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="55%" stop-color="#111a2e"/>
+      <stop offset="100%" stop-color="#1a1030"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4ff8d2"/>
+      <stop offset="55%" stop-color="#5aa9ff"/>
+      <stop offset="100%" stop-color="#b48bff"/>
+    </linearGradient>
+    <linearGradient id="spine1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4ff8d2"/>
+      <stop offset="100%" stop-color="#1f7a8c"/>
+    </linearGradient>
+    <linearGradient id="spine2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5aa9ff"/>
+      <stop offset="100%" stop-color="#2c5fb8"/>
+    </linearGradient>
+    <linearGradient id="spine3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b48bff"/>
+      <stop offset="100%" stop-color="#6c3fb0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="300" fill="url(#bg)"/>
+
+  <g opacity="0.35">
+    <circle cx="1080" cy="55" r="1.5" fill="#4ff8d2"/>
+    <circle cx="1120" cy="90" r="1.5" fill="#5aa9ff"/>
+    <circle cx="1150" cy="50" r="1.5" fill="#b48bff"/>
+    <circle cx="1030" cy="95" r="1.5" fill="#5aa9ff"/>
+    <circle cx="1170" cy="120" r="1.5" fill="#4ff8d2"/>
+    <circle cx="990" cy="60" r="1.5" fill="#b48bff"/>
+  </g>
+
+  <text x="70" y="70" font-family="Consolas, 'Courier New', monospace" font-size="15" fill="#5aa9ff" opacity="0.75">~/library $ run --client</text>
+
+  <text x="68" y="150" font-family="'Segoe UI', system-ui, sans-serif" font-size="66" font-weight="700" fill="url(#title)">ProjetBiblio</text>
+
+  <text x="70" y="188" font-family="'Segoe UI', system-ui, sans-serif" font-size="19" font-style="italic" fill="#9aa7c7">A terminal library manager that actually respects your database credentials</text>
+
+  <text x="70" y="222" font-family="Consolas, 'Courier New', monospace" font-size="13" fill="#5f6c8a">// python client &#8226; fastapi server &#8226; turso db &#8226; ci-built windows exe</text>
+
+  <line x1="70" y1="245" x2="640" y2="245" stroke="#2a3352" stroke-width="1"/>
+
+  <g transform="translate(940,140)">
+    <rect x="0"   y="60" width="26" height="100" rx="3" fill="url(#spine1)"/>
+    <rect x="34"  y="30" width="26" height="130" rx="3" fill="url(#spine2)"/>
+    <rect x="68"  y="80" width="26" height="80"  rx="3" fill="url(#spine3)"/>
+    <rect x="102" y="10" width="26" height="150" rx="3" fill="url(#spine1)"/>
+    <rect x="136" y="50" width="26" height="110" rx="3" fill="url(#spine2)"/>
+    <rect x="0" y="160" width="162" height="8" rx="2" fill="#2a3352"/>
+  </g>
+</svg>
