@@ -78,7 +78,7 @@ class APITests(unittest.TestCase):
         response = self.client.get("/admin/stats", headers=headers)
         self.assertEqual(response.status_code, 200)
         body = response.json()
-        for key in ("low_stock_titles", "overdue_rentals", "total_revenue"):
+        for key in ("low_stock_titles", "out_of_stock_titles", "overdue_rentals", "total_revenue", "total_students"):
             self.assertIn(key, body)
 
     def test_admin_can_add_book(self):
