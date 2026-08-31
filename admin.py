@@ -52,7 +52,30 @@ def add_book(book):
         )
         return cursor.lastrowid
 
-def modify_books(id_book, title, description, author, purchase_price, rental_price, stock):
+def get_stats():
+    """Compute the admin dashboard numbers: inventory, sales/rental
+    activity, low/out-of-stock alerts, overdue rentals, revenue, and
+    registered students. Returns a plain dict."""
+    with closing(get_connection()) as connection:
+        row = connection.execute(
+            """
+            SELECT
+                (SELECT COUNT(*) FROM books) AS book_titles,
+                (SELECT COALESCE(SUM(stock), 0) FROM books) AS available_stock,
+                (SELECT COALESCE(SUM(quantity), 0) FROM purchases) AS units_sold,
+                (SELECT COALESCE(SUM(quantity), 0) FROM rentals) AS units_rented,
+                (SELECT COUNT(*) FROM rentals WHERE status = 'active') AS active_rentals,
+                (SELECT COUNT(*) FROM books WHERE stock <= 2) AS low_stock_titles,
+                (SELECT COUNT(*) FROM books WHERE stock = 0) AS out_of_stock_titles,
+                (SELECT COUNT(*) FROM rentals
+                    WHERE status = 'active' AND due_at < CURRENT_TIMESTAMP) AS overdue_rentals,
+                (SELECT COALESCE(SUM(quantity * unit_price), 0) FROM purchases)
+                    + (SELECT COALESCE(SUM(quantity * unit_price), 0) FROM rentals)
+                    AS total_revenue,
+                (SELECT COUNT(*) FROM users WHERE role = 'student') AS total_students
+            """
+        ).fetchone()
+        return dict(zip(row.keys(), tuple(row)))
     """Update an existing book with already-known new values.
     Returns True on success, or None if the book doesn't exist."""
     with closing(get_connection()) as connection, connection:
