@@ -104,6 +104,9 @@ def admin_session(client):
                 print(f"Units sold: {stats['units_sold']}")
                 print(f"Units rented: {stats['units_rented']}")
                 print(f"Active rentals: {stats['active_rentals']}")
+                print(f"Low stock titles (<=2): {stats['low_stock_titles']}")
+                print(f"Overdue rentals: {stats['overdue_rentals']}")
+                print(f"Total revenue: {stats['total_revenue']:.2f}")
             elif choice == 4:
                 client.logout()
                 return
