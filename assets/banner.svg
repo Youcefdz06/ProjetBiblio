@@ -23,17 +23,34 @@
       <stop offset="0%" stop-color="#b48bff"/>
       <stop offset="100%" stop-color="#6c3fb0"/>
     </linearGradient>
+    <linearGradient id="spine4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd479"/>
+      <stop offset="100%" stop-color="#c9862f"/>
+    </linearGradient>
+    <linearGradient id="page" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a3352"/>
+      <stop offset="100%" stop-color="#1a2038"/>
+    </linearGradient>
   </defs>
 
   <rect x="0" y="0" width="1200" height="300" fill="url(#bg)"/>
 
+  <!-- faint shelf-plank texture across the whole banner -->
+  <g stroke="#26304d" stroke-width="1" opacity="0.5">
+    <line x1="0" y1="95"  x2="1200" y2="95"/>
+    <line x1="0" y1="205" x2="1200" y2="205"/>
+  </g>
+
+  <!-- faint oversized open-book watermark behind the title -->
+  <g opacity="0.06" fill="#5aa9ff">
+    <path d="M420 60 C 340 40 260 45 210 65 L210 260 C 260 240 340 235 420 255 Z"/>
+    <path d="M420 60 C 500 40 580 45 630 65 L630 260 C 580 240 500 235 420 255 Z"/>
+  </g>
+
   <g opacity="0.35">
-    <circle cx="1080" cy="55" r="1.5" fill="#4ff8d2"/>
-    <circle cx="1120" cy="90" r="1.5" fill="#5aa9ff"/>
-    <circle cx="1150" cy="50" r="1.5" fill="#b48bff"/>
-    <circle cx="1030" cy="95" r="1.5" fill="#5aa9ff"/>
-    <circle cx="1170" cy="120" r="1.5" fill="#4ff8d2"/>
-    <circle cx="990" cy="60" r="1.5" fill="#b48bff"/>
+    <circle cx="1080" cy="45" r="1.5" fill="#4ff8d2"/>
+    <circle cx="1120" cy="80" r="1.5" fill="#5aa9ff"/>
+    <circle cx="1150" cy="40" r="1.5" fill="#b48bff"/>
   </g>
 
   <text x="70" y="70" font-family="Consolas, 'Courier New', monospace" font-size="15" fill="#5aa9ff" opacity="0.75">~/library $ run --client</text>
@@ -46,12 +63,33 @@
 
   <line x1="70" y1="245" x2="640" y2="245" stroke="#2a3352" stroke-width="1"/>
 
-  <g transform="translate(940,140)">
-    <rect x="0"   y="60" width="26" height="100" rx="3" fill="url(#spine1)"/>
-    <rect x="34"  y="30" width="26" height="130" rx="3" fill="url(#spine2)"/>
-    <rect x="68"  y="80" width="26" height="80"  rx="3" fill="url(#spine3)"/>
-    <rect x="102" y="10" width="26" height="150" rx="3" fill="url(#spine1)"/>
-    <rect x="136" y="50" width="26" height="110" rx="3" fill="url(#spine2)"/>
-    <rect x="0" y="160" width="162" height="8" rx="2" fill="#2a3352"/>
+  <!-- open book resting on the shelf -->
+  <g transform="translate(870,150)">
+    <path d="M60 8 C 40 -2 15 -4 0 4 L0 78 C 15 70 40 72 60 82 Z" fill="url(#page)" stroke="#3a4468" stroke-width="1"/>
+    <path d="M60 8 C 80 -2 105 -4 120 4 L120 78 C 105 70 80 72 60 82 Z" fill="url(#page)" stroke="#3a4468" stroke-width="1"/>
+    <line x1="60" y1="8" x2="60" y2="82" stroke="#4a5580" stroke-width="1.5"/>
+    <g stroke="#4a5580" stroke-width="1" opacity="0.8">
+      <line x1="10" y1="18" x2="52" y2="14"/>
+      <line x1="10" y1="30" x2="52" y2="26"/>
+      <line x1="10" y1="42" x2="52" y2="38"/>
+      <line x1="68" y1="14" x2="110" y2="18"/>
+      <line x1="68" y1="26" x2="110" y2="30"/>
+      <line x1="68" y1="38" x2="110" y2="42"/>
+    </g>
+  </g>
+
+  <!-- bookshelf: a proper row of spines, not bars -->
+  <g transform="translate(945,205)">
+    <rect x="0"   y="20" width="24" height="80" rx="3" fill="url(#spine1)"/>
+    <rect x="0"   y="26" width="24" height="6"  fill="#0d1117" opacity="0.35"/>
+    <rect x="30"  y="0"  width="24" height="100" rx="3" fill="url(#spine2)"/>
+    <rect x="30"  y="8"  width="24" height="6"  fill="#0d1117" opacity="0.35"/>
+    <rect x="60"  y="35" width="24" height="65" rx="3" fill="url(#spine3)"/>
+    <rect x="60"  y="41" width="24" height="6"  fill="#0d1117" opacity="0.35"/>
+    <rect x="90"  y="10" width="24" height="90" rx="3" fill="url(#spine4)"/>
+    <rect x="90"  y="17" width="24" height="6"  fill="#0d1117" opacity="0.35"/>
+    <rect x="120" y="28" width="24" height="72" rx="3" fill="url(#spine1)"/>
+    <rect x="120" y="34" width="24" height="6"  fill="#0d1117" opacity="0.35"/>
+    <rect x="-8" y="100" width="180" height="7" rx="2" fill="#2a3352"/>
   </g>
 </svg>
