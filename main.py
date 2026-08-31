@@ -1,5 +1,5 @@
 from api_client import APIError, LibraryAPIClient
-from menus import admin_menu, login_menu, user_menu
+from menus import admin_menu, auth_menu, login_menu, signup_menu, user_menu
 from utilities import ask_yn
 
 
@@ -173,9 +173,16 @@ def main():
         return
 
     while True:
-        username, password = login_menu()
+        choice = auth_menu()
         try:
-            user = client.login(username, password)
+            if choice == "1":
+                username, password = login_menu()
+                user = client.login(username, password)
+            else:
+                username, password = signup_menu()
+                if ask_yn(f"Create account '{username}'? y/n: ") == "n":
+                    continue
+                user = client.signup(username, password)
         except APIError as error:
             print(error)
             continue

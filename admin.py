@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from contextlib import closing
-import sqlite3
 from database import get_connection
 
 @dataclass
@@ -11,12 +10,6 @@ class Book:
     purchase_price:float
     rental_price:float
     stock:int
-
-def ask_yn(prompt):
-    x = input(prompt).lower()
-    while x not in ("y", "n"):
-        x = input("please enter y or n : ").lower()
-    return x
 
 def read_book () :
     print("------------------------------------------------")
@@ -41,15 +34,27 @@ def read_book () :
        stock
      )
 
-def add_book (Book) :
-    with closing(get_connection()) as conn:
-        conn.execute(
+def add_book(book):
+    """Insert a new book. `book` just needs title/description/author/
+    purchase_price/rental_price/stock attributes (a Book, or the API's
+    BookCreate payload both work). Returns the new book's id."""
+    with closing(get_connection()) as conn, conn:
+        cursor = conn.execute(
             """INSERT INTO books (title, description, author, purchase_price, rental_price, stock) VALUES (?, ?, ?, ?, ?, ?)""",
-            (Book.title, Book.description, Book.author, Book.purchase_price, Book.rental_price, Book.stock)
+            (
+                book.title.strip(),
+                book.description.strip(),
+                book.author.strip(),
+                book.purchase_price,
+                book.rental_price,
+                book.stock,
+            ),
         )
-        conn.commit()
+        return cursor.lastrowid
 
-def modify_books(id_book):
+def modify_books(id_book, title, description, author, purchase_price, rental_price, stock):
+    """Update an existing book with already-known new values.
+    Returns True on success, or None if the book doesn't exist."""
     with closing(get_connection()) as connection, connection:
         book = connection.execute(
             "SELECT * FROM books WHERE id = ?",
@@ -57,15 +62,7 @@ def modify_books(id_book):
         ).fetchone()
 
         if book is None:
-            print("Book not found.")
-            return
-
-        title = input(f"Title [{book['title']}]: ") or book["title"]
-        description = input(f"Description [{book['description']}]: ") or book["description"]
-        author = input(f"Author [{book['author']}]: ") or book["author"]
-        purchase_price = float(input(f"Purchase price [{book['purchase_price']}]: ") or book["purchase_price"])
-        rental_price = float(input(f"Rental price [{book['rental_price']}]: ") or book["rental_price"])
-        stock = int( input(f"Stock [{book['stock']}]: ") or book["stock"])
+            return None
 
         connection.execute(
             """
@@ -89,5 +86,4 @@ def modify_books(id_book):
                 id_book,
             ),
         )
-
-        print("Book updated successfully.")
+        return True

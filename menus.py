@@ -1,6 +1,20 @@
+def auth_menu():
+    while True:
+        choice = input("1-Login, 2-Sign up: ")
+        if choice in ("1", "2"):
+            return choice
+        print("Please choose 1 or 2.")
+
+
 def login_menu():
     username = input("Enter your username: ")
     password = input("Enter your password: ")
+    return username, password
+
+
+def signup_menu():
+    username = input("Choose a username: ")
+    password = input("Choose a password: ")
     return username, password
 
 

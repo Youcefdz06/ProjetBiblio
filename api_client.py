@@ -56,6 +56,15 @@ class LibraryAPIClient:
         self.session.headers["Authorization"] = f"Bearer {result['token']}"
         return result["user"]
 
+    def signup(self, username, password):
+        result = self._request(
+            "POST",
+            "/auth/signup",
+            json={"username": username, "password": password},
+        )
+        self.session.headers["Authorization"] = f"Bearer {result['token']}"
+        return result["user"]
+
     def logout(self):
         try:
             return self._request("POST", "/auth/logout")
