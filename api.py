@@ -1,7 +1,7 @@
 import os
 import secrets
 import threading
-from contextlib import asynccontextmanager, closing
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 import admin
 import auth
 import user
-from database import get_connection, init_database
+from database import init_database
 
 
 SESSION_TTL_HOURS = int(os.getenv("SESSION_TTL_HOURS", "12"))
@@ -277,23 +277,4 @@ def update_book_route(
 
 @app.get("/admin/stats")
 def admin_stats(_admin_user=Depends(require_admin)):
-    with closing(get_connection()) as connection:
-        row = connection.execute(
-            """
-            SELECT
-                (SELECT COUNT(*) FROM books) AS book_titles,
-                (SELECT COALESCE(SUM(stock), 0) FROM books) AS available_stock,
-                (SELECT COALESCE(SUM(quantity), 0) FROM purchases) AS units_sold,
-                (SELECT COALESCE(SUM(quantity), 0) FROM rentals) AS units_rented,
-                (SELECT COUNT(*) FROM rentals WHERE status = 'active') AS active_rentals,
-                (SELECT COUNT(*) FROM books WHERE stock <= 2) AS low_stock_titles,
-                (SELECT COUNT(*) FROM books WHERE stock = 0) AS out_of_stock_titles,
-                (SELECT COUNT(*) FROM rentals
-                    WHERE status = 'active' AND due_at < CURRENT_TIMESTAMP) AS overdue_rentals,
-                (SELECT COALESCE(SUM(quantity * unit_price), 0) FROM purchases)
-                    + (SELECT COALESCE(SUM(quantity * unit_price), 0) FROM rentals)
-                    AS total_revenue,
-                (SELECT COUNT(*) FROM users WHERE role = 'student') AS total_students
-            """
-        ).fetchone()
-    return _row_to_dict(row)
+    return admin.get_stats()
