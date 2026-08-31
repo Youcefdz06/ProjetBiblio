@@ -73,6 +73,14 @@ class APITests(unittest.TestCase):
         response = self.client.get("/admin/stats", headers=headers)
         self.assertEqual(response.status_code, 403)
 
+    def test_admin_stats_includes_new_fields(self):
+        headers = self.login("admin", "adminpass")
+        response = self.client.get("/admin/stats", headers=headers)
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        for key in ("low_stock_titles", "overdue_rentals", "total_revenue"):
+            self.assertIn(key, body)
+
     def test_admin_can_add_book(self):
         headers = self.login("admin", "adminpass")
         response = self.client.post(
