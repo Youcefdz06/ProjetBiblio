@@ -1,8 +1,6 @@
 <div align="center">
 
-# 📚 ProjetBiblio
-
-### A terminal library manager that actually respects your database credentials
+<img src="https://raw.githubusercontent.com/Youcefdz06/ProjetBiblio/main/assets/banner.svg" alt="ProjetBiblio — a terminal library manager that actually respects your database credentials" width="100%">
 
 *(a rare quality in student projects, we know)*
 
